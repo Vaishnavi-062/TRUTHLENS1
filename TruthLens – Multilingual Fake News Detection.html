@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>TruthLens – Multilingual Fake News Detection</title>
+<style>
+:root{--bg:#f4f6fb;--card:#fff;--tx:#162036;--mut:#64708a;--bd:#e3e8f2;--pri:#4f46e5;--acc:#06b6d4;--ok:#10b981;--bad:#ef4444;--warn:#f59e0b;--side:#0f172a;--soft:#eef0ff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b1020;--card:#141b2f;--tx:#e8ecf7;--mut:#94a0bd;--bd:#252f4a;--side:#070b17;--soft:#1c2547}}
+:root[data-theme="dark"]{--bg:#0b1020;--card:#141b2f;--tx:#e8ecf7;--mut:#94a0bd;--bd:#252f4a;--side:#070b17;--soft:#1c2547}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,"Nirmala UI",sans-serif}
+#side{position:fixed;left:0;top:0;bottom:0;width:250px;background:var(--side);color:#cbd5e1;padding:calc(18px + env(safe-area-inset-top,0px)) 14px 18px;display:flex;flex-direction:column;gap:4px;z-index:20;transition:transform .3s}
+.logo{display:flex;align-items:center;gap:10px;color:#fff;font-weight:800;font-size:20px;margin:0 6px 18px}
+.logo s{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--pri),var(--acc));display:grid;place-items:center;text-decoration:none;font-size:18px}
+#side a{display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:10px;color:#cbd5e1;text-decoration:none;font-weight:500;transition:.2s}
+#side a:hover{background:#ffffff14}#side a.on{background:linear-gradient(90deg,var(--pri),#6366f1);color:#fff;box-shadow:0 6px 18px #4f46e555}
+.sf{margin-top:auto;font-size:12px;color:#8391ab;padding:8px}
+.sf button{margin-bottom:8px;width:100%}
+#top{display:none;position:sticky;top:env(safe-area-inset-top,0px);z-index:15;background:var(--side);color:#fff;padding:10px 14px;align-items:center;gap:10px;font-weight:700}
+#top button{background:none;border:0;color:#fff;font-size:22px}
+main{margin-left:250px;padding:28px 34px 40px;max-width:1180px}
+@media(max-width:860px){#side{transform:translateX(-100%)}#side.open{transform:none}#top{display:flex}main{margin:0;padding:18px 14px 40px}}
+h1{font-size:28px;margin:0 0 4px}h2{font-size:19px;margin:26px 0 12px}h3{margin:0 0 6px;font-size:16px}
+.sub{color:var(--mut);margin:0 0 20px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:18px;box-shadow:0 2px 10px #0000000a;animation:up .5s both}
+.grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+.g2{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes fl{50%{transform:translateY(-12px)}}
+.badge{display:inline-block;padding:3px 10px;border-radius:99px;font-size:12px;font-weight:700;background:var(--soft);color:var(--pri)}
+.b-d{background:#fef3c7;color:#92400e}.b-f{background:#fee2e2;color:#b91c1c}.b-r{background:#d1fae5;color:#047857}
+.demo{border:1px dashed var(--warn);background:#f59e0b14;color:var(--tx);padding:10px 14px;border-radius:12px;margin-bottom:18px;font-size:14px}
+.btn{background:linear-gradient(135deg,var(--pri),#7c3aed);color:#fff;border:0;border-radius:12px;padding:12px 22px;font-weight:700;font-size:15px;cursor:pointer;text-decoration:none;display:inline-block;transition:.2s;box-shadow:0 8px 20px #4f46e540}
+.btn:hover{transform:translateY(-2px)}.btn.ghost{background:#ffffff1f;box-shadow:none;border:1px solid #ffffff55}
+.sf .btn{padding:8px;font-size:13px;background:#ffffff14;box-shadow:none}
+.hero{background:linear-gradient(135deg,#1e1b4b,#4f46e5 55%,#06b6d4);color:#fff;border-radius:22px;padding:46px 34px;position:relative;overflow:hidden}
+.hero h1{font-size:44px;letter-spacing:-1px}.hero p{max-width:560px;opacity:.9;font-size:17px}
+.hero svg{position:absolute;right:-20px;top:10px;width:380px;opacity:.35;animation:fl 6s ease-in-out infinite}
+@media(max-width:700px){.hero h1{font-size:34px}.hero svg{display:none}}
+.ic{font-size:26px}.big{font-size:30px;font-weight:800}
+textarea,select{width:100%;background:var(--bg);color:var(--tx);border:1px solid var(--bd);border-radius:12px;padding:12px;font:inherit}
+textarea{min-height:190px;resize:vertical}
+.chip{display:inline-block;margin:3px 4px 3px 0;padding:5px 12px;border-radius:99px;border:1px solid var(--bd);background:var(--card);color:var(--tx);cursor:pointer;font-size:13px}
+.chip:hover{border-color:var(--pri);color:var(--pri)}
+table{width:100%;border-collapse:collapse;font-size:14px}th,td{padding:10px;border-bottom:1px solid var(--bd);text-align:left}th{color:var(--mut);font-size:12px;text-transform:uppercase}
+.wrap{overflow-x:auto}
+.hb .r{display:grid;grid-template-columns:120px 1fr;gap:10px;align-items:start;margin:9px 0;font-size:13px}
+.hb .t i{display:block;height:20px;border-radius:6px;width:0;margin-bottom:3px;transition:width 1.1s cubic-bezier(.2,.8,.2,1);position:relative}
+.hb b{position:absolute;right:6px;top:0;font-size:11px;color:#fff;line-height:20px}
+.lg span{display:inline-block;margin-right:14px;font-size:12px;color:var(--mut)}.lg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px}
+.ring{width:130px;height:130px}.ring circle{fill:none;stroke-width:10;stroke-linecap:round}
+.ring .fg{transition:stroke-dasharray 1.2s ease;transform:rotate(-90deg);transform-origin:center}
+.vd{font-size:34px;font-weight:900;letter-spacing:1px}
+.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:14px 0}
+.kv div{background:var(--bg);border-radius:12px;padding:10px 12px}.kv small{display:block;color:var(--mut);font-size:12px}
+mark{padding:1px 4px;border-radius:5px;color:inherit}.mf{background:#ef444440}.mr{background:#10b98140}
+.dv{display:grid;grid-template-columns:90px 1fr 50px;gap:8px;align-items:center;margin:7px 0;font-size:13px}
+.t2{height:18px;position:relative;background:var(--bg);border-radius:6px}.t2:after{content:"";position:absolute;left:50%;top:0;bottom:0;border-left:1px solid var(--mut)}.t2 i{position:absolute;top:3px;bottom:3px;border-radius:4px}
+.step{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}.step span{background:#ffffff1f;border:1px solid #ffffff44;border-radius:10px;padding:6px 12px;font-size:13px}
+.foot{margin-top:30px;color:var(--mut);font-size:12px;text-align:center}
+.spin{animation:up .4s both}
+</style>
+</head>
+<body>
+<div id="top"><button onclick="side.classList.toggle('open')" aria-label="menu">☰</button>🔍 TruthLens</div>
+<nav id="side"></nav>
+<main id="app"></main>
+<script>
+/* ---------- DEMO ENGINE (rule-based stand-in; NOT the trained XLM-RoBERTa) ---------- */
+const FK="shocking,secret,hidden truth,hiding,hide,share,forward,miracle,cure,100%,leaked,lying,lie,viral,delete,exposed,banned,impactante,secreto,oculta,compártelo,reenvía,milagro,filtrado,miente,borren,चौंकाने,सच,छुप,शेयर,फॉरवर्ड,वायरल,चमत्कार,झूठ,डिलीट,அதிர்ச்சி,மறை,பகிர,உண்மை,அனுப்புங்கள்,நீக்கப்படும்,வைரல்,ഞെട്ടിക്കുന്ന,രഹസ്യ,ഷെയർ,മറച്ച,വൈറൽ,షాకింగ్,రహస్య,షేర్,దాచ,వైరల్,ಆಘಾತ,ರಹಸ್ಯ,ಶೇರ್,ಮುಚ್ಚಿಟ,ವೈರಲ್".split(",");
+const RK="according to,officials,official,ministry,report,announced,said,percent,published,briefing,parliament,statement,central bank,según,ministerio,informe,anunci,autoridades,publicado,rueda de prensa,अधिकारियों,मंत्रालय,रिपोर्ट,घोषणा,जानकारी दी,प्रकाशित,संसद,प्रेस,அதிகாரிகள்,அமைச்சகம்,அறிக்கை,வெளியிட்ட,செய்தியாளர்,தெரிவித்த,ഉദ്യോഗസ്ഥർ,റിപ്പോർട്ട്,മന്ത്രാലയ,പ്രഖ്യാപി,అధికారులు,నివేదిక,మంత్రిత్వ,ప్రకటించ,ಅಧಿಕಾರಿಗಳು,ವರದಿ,ಸಚಿವಾಲಯ,ಘೋಷಿಸ".split(",");
+const LN={ta:"Tamil",hi:"Hindi",te:"Telugu",kn:"Kannada",ml:"Malayalam",es:"Spanish",en:"English"};
+const SC={ta:/[\u0B80-\u0BFF]/g,hi:/[\u0900-\u097F]/g,te:/[\u0C00-\u0C7F]/g,kn:/[\u0C80-\u0CFF]/g,ml:/[\u0D00-\u0D7F]/g};
+const esc=s=>s.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
+const KRE=new RegExp([...FK,...RK].sort((a,b)=>b.length-a.length).map(esc).join("|"),"gi");
+function detectLang(t){let best="",n=2;for(const k in SC){const c=(t.match(SC[k])||[]).length;if(c>n){n=c;best=k}}
+ if(best)return best;return /[¡¿ñáéíóú]|\b(el|la|los|las|de|que|según)\b/i.test(t)?"es":"en"}
+function predict(t){const hits=[];(t.match(KRE)||[]).forEach(m=>{const k=m.toLowerCase();hits.push({k:m,f:FK.includes(k)})});
+ const f=hits.filter(h=>h.f).length,r=hits.length-f,ex=Math.min((t.match(/[!！]/g)||[]).length,3);
+ const L=t.replace(/[^A-Za-z]/g,""),caps=L.length>10?(t.replace(/[^A-Z]/g,"").length/L.length):0;
+ const s=f+ex*.4+(caps>.3?1:0)-r*1.1-.3,p=1/(1+Math.exp(-s*.55)),fake=p>=.5;
+ return{fake,conf:Math.round(Math.min(97,Math.max(55,Math.max(p,1-p)*100))*10)/10,lang:detectLang(t),hits,f,r,ex,caps}}
+/* ---------- helpers ---------- */
+const $=s=>document.querySelector(s),side=$("#side"),app=$("#app");
+const PG=[["home","🏠","Home"],["detect","🔎","Detect News"],["compare","📊","Model Comparison"],["multi","🌍","Multilingual Testing"],["explain","🧠","Explainability"],["errors","🧪","Error Analysis"],["about","📘","About Project"]];
+const DEMOB='<div class="demo"><b>DEMO RESULTS</b> – placeholder values for presentation only. They are <b>not</b> experimental results; real numbers appear after the models are trained and connected.</div>';
+const hb=(rows,cols=["var(--pri)","var(--warn)"],max=100)=>`<div class="hb">${rows.map(([l,v])=>`<div class="r"><span>${l}</span><div class="t">${[].concat(v).map((x,i)=>`<i data-w="${x/max*100}" style="background:${cols[i]}"><b>${x}%</b></i>`).join("")}</div></div>`).join("")}</div>`;
+const lg=(a,c=["var(--pri)","var(--warn)"])=>`<div class="lg">${a.map((x,i)=>`<span><i style="background:${c[i]}"></i>${x}</span>`).join("")}</div>`;
+const tbl=(h,r)=>`<div class="wrap"><table><tr>${h.map(x=>`<th>${x}</th>`).join("")}</tr>${r.map(x=>`<tr>${x.map(c=>`<td>${c}</td>`).join("")}</tr>`).join("")}</table></div>`;
+const head=(t,s)=>`<h1>${t}</h1><p class="sub">${s}</p>`;
+const foot='<div class="foot">TruthLens · College project prototype · Interface demo – predictions and metrics shown are DEMO unless stated otherwise</div>';
+const MODELS=[["Logistic Regression","Linear · TF-IDF n-grams",88.1,87.4,86.9,87.1,61.0],["Multinomial Naive Bayes","Probabilistic · TF-IDF",85.2,84.0,85.9,84.9,58.0],["Random Forest","Ensemble · TF-IDF + SVD",89.7,90.2,87.5,88.8,64.0],["XGBoost","Gradient boosting · TF-IDF + SVD",91.3,91.0,90.1,90.5,66.0],["XLM-RoBERTa","Multilingual transformer · fine-tuned",94.6,94.1,94.8,94.4,85.0]];
+const SAMPLES=[["EN · Fake","SHOCKING: Doctors are hiding the secret cure for diabetes! 100% guaranteed, share with everyone before they delete this!!!"],["EN · Real","The central bank kept interest rates unchanged on Tuesday, officials said, citing steady inflation in its latest report."],["TA · Fake","அதிர்ச்சி! இந்த வீட்டு வைத்தியம் புற்றுநோயை 100% குணப்படுத்தும், மருத்துவர்கள் உண்மையை மறைக்கிறார்கள், உடனே பகிருங்கள்!!!"],["TA · Real","திங்களன்று செய்தியாளர் சந்திப்பில் அதிகாரிகள் புதிய கல்விக் கொள்கை குறித்த அறிக்கையை வெளியிட்டனர்."],["HI · Fake","चौंकाने वाला सच! सरकार ने छुपाई यह बात, डिलीट होने से पहले अभी शेयर करें!!!"],["ES · Real","Las autoridades anunciaron el lunes un informe sobre el precio de la gasolina, según el ministerio."]];
+const hl=t=>t.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(KRE,m=>`<mark class="${FK.includes(m.toLowerCase())?"mf":"mr"}">${m}</mark>`);
+/* ---------- pages ---------- */
+const P={
+home:()=>`<div class="hero"><svg viewBox="0 0 200 200" fill="none" stroke="#fff"><circle cx="100" cy="100" r="70"/><circle cx="100" cy="100" r="35"/><path d="M30 100h140M100 30v140M50 50l100 100M150 50L50 150"/><g fill="#fff"><circle cx="100" cy="30" r="6"/><circle cx="170" cy="100" r="6"/><circle cx="100" cy="170" r="6"/><circle cx="30" cy="100" r="6"/><circle cx="100" cy="100" r="9"/></g></svg>
+<span class="badge" style="background:#ffffff26;color:#fff">🎓 College Project · NLP + Deep Learning</span><h1>TruthLens</h1><p>Multilingual fake-news detection using transformer models. One language-independent detector for English, Tamil, Hindi, Spanish and more – instead of a separate model per language.</p>
+<a class="btn" href="#detect">Detect Fake News →</a> <a class="btn ghost" href="#about">About the project</a>
+<div class="step"><span>📰 News text</span><span>🧹 Preprocessing</span><span>🔤 XLM-RoBERTa</span><span>✅ REAL / ❌ FAKE</span><span>🧠 SHAP · LIME</span></div></div>
+<h2>What this prototype covers</h2><div class="grid">${[["🔎","Live analyzer","Paste news in 8 language options and get a verdict, confidence and reasons."],["📊","5-model comparison","Logistic Regression, Naive Bayes, Random Forest, XGBoost and XLM-RoBERTa."],["🌍","Zero-shot testing","Train on some languages, test on an unseen one (Tamil held out)."],["🧠","Explainable AI","SHAP and LIME style word-level explanations."],["🧪","Error analysis","False positives, false negatives, by language and article length."]].map(c=>`<div class="card"><div class="ic">${c[0]}</div><h3>${c[1]}</h3><p class="sub" style="margin:0">${c[2]}</p></div>`).join("")}</div>
+<div class="demo" style="margin-top:20px"><b>Status:</b> the analyzer runs in <b>DEMO MODE</b> (a rule-based stand-in) and all metrics are labelled <b>DEMO</b>. No trained model is connected to this page yet.</div>${foot}`,
+
+detect:()=>`${head("Fake News Detection","Paste an article, choose its language and analyze. Try a sample to demonstrate instantly.")}
+<div class="grid g2"><div class="card"><h3>News article</h3><div>${SAMPLES.map((s,i)=>`<span class="chip" data-s="${i}">${s[0]}</span>`).join("")}</div>
+<textarea id="txt" placeholder="Paste a news headline or article here…"></textarea><p style="margin:12px 0 6px;font-weight:600">Language</p>
+<select id="lang">${["English","Tamil","Hindi","Spanish","Malayalam","Telugu","Kannada","Other"].map(l=>`<option>${l}</option>`).join("")}</select>
+<p style="margin:16px 0 0"><button class="btn" id="go">Analyze News</button> <span id="err" style="color:var(--bad);margin-left:8px"></span></p></div>
+<div class="card" id="res"><h3>Result</h3><p class="sub">Your analysis will appear here.</p><span class="badge b-d">DEMO MODE</span></div></div>${foot}`,
+
+compare:()=>`${head("Model Comparison","Five models evaluated on the same test split (layout ready – numbers are placeholders).")}${DEMOB}
+<div class="grid">${MODELS.map((m,i)=>`<div class="card" style="${i==4?"border-color:var(--pri);box-shadow:0 8px 28px #4f46e533":""}"><span class="badge ${i==4?"":"b-d"}">${i==4?"Main model":"Baseline"}</span><h3 style="margin-top:8px">${m[0]}</h3><p class="sub" style="margin:0 0 8px;font-size:13px">${m[1]}</p><div class="big">${m[5]}%</div><small style="color:var(--mut)">F1-score · DEMO</small></div>`).join("")}</div>
+<h2>Metrics table <span class="badge b-d">DEMO</span></h2><div class="card">${tbl(["Model","Accuracy","Precision","Recall","F1-score"],MODELS.map(m=>[`<b>${m[0]}</b>`,m[2]+"%",m[3]+"%",m[4]+"%",m[5]+"%"]))}</div>
+<h2>F1-score comparison <span class="badge b-d">DEMO</span></h2><div class="card">${hb(MODELS.map(m=>[m[0].replace("Multinomial ",""),m[5]]),["var(--pri)"])}</div>${foot}`,
+
+multi:()=>{const g=MODELS.map(m=>[m[0].replace("Multinomial ",""),[m[5],m[6]]]);return`${head("Multilingual Testing","Does the detector still work on a language it never saw during training?")}${DEMOB}
+<div class="grid"><div class="card"><h3>Seen languages (training)</h3><p>${["English","Hindi","Spanish"].map(l=>`<span class="badge b-r">${l}</span>`).join(" ")}</p></div>
+<div class="card"><h3>Unseen languages (zero-shot test)</h3><p>${["Tamil (held-out)","Telugu","Kannada","Malayalam"].map(l=>`<span class="badge b-f">${l}</span>`).join(" ")}</p></div></div>
+<div class="grid g2"><div><h2>Language performance – XLM-RoBERTa <span class="badge b-d">DEMO</span></h2><div class="card">${lg(["Seen","Unseen"])}${hb([["English",95.2],["Hindi",93.8],["Spanish",94.1]],["var(--pri)"])}${hb([["Tamil ★",86.0],["Telugu",83.4],["Kannada",82.7],["Malayalam",82.1]],["var(--warn)"])}</div></div>
+<div><h2>Language performance gap per model <span class="badge b-d">DEMO</span></h2><div class="card">${lg(["Seen-language F1","Unseen-language F1"])}${hb(g)}<p class="sub" style="margin:10px 0 0;font-size:13px">Hypothesis to verify: n-gram models lose far more on an unseen language than XLM-RoBERTa.</p></div></div></div>
+<h2>Tamil held-out example</h2><div class="card"><p class="sub">Tamil was excluded from training. The demo analyzer is used below – the trained model's output will replace it.</p><p style="font-size:17px">${hl(SAMPLES[2][1])}</p><a class="btn" href="#detect" data-s="2">Try this in the analyzer →</a></div>${foot}`},
+
+explain:()=>{const S=[{t:"SHOCKING: Doctors hide the secret cure, share before it is deleted!!!",fake:1,sh:[["SHOCKING",.31],["secret",.22],["share",.18],["deleted",.14],["hide",.12],["cure",.1],["Doctors",.04],["before",-.02]],li:{SHOCKING:.28,hide:.15,secret:.2,cure:.11,share:.17,deleted:.13}},{t:"The central bank kept interest rates unchanged on Tuesday, officials said.",fake:0,sh:[["officials",-.27],["said",-.19],["central bank",-.16],["unchanged",-.1],["Tuesday",-.06],["kept",.01]],li:{officials:-.25,said:-.2,"central bank":-.14,unchanged:-.09}}];
+return`${head("Explainability","Which words push a prediction towards FAKE or REAL?")}<div class="demo"><b>ILLUSTRATIVE SAMPLE</b> – hand-made values to show the layout. Real SHAP/LIME outputs are generated from the trained model.</div>
+${S.map(s=>`<div class="card" style="margin-bottom:16px"><span class="badge ${s.fake?"b-f":"b-r"}">Sample · ${s.fake?"FAKE":"REAL"}</span><p style="font-size:16px">${s.t}</p><div class="grid g2"><div><h3>SHAP <small style="color:var(--mut);font-weight:400">– feature contributions</small></h3>${s.sh.map(([w,v])=>`<div class="dv"><span>${w}</span><div class="t2"><i style="${v>0?`left:50%;width:${v/.4*50}%;background:var(--bad)`:`right:50%;width:${-v/.4*50}%;background:var(--ok)`}"></i></div><em>${v>0?"+":""}${v}</em></div>`).join("")}<small style="color:var(--mut)">Red → towards FAKE · Green → towards REAL</small></div>
+<div><h3>LIME <small style="color:var(--mut);font-weight:400">– local word weights</small></h3><p style="line-height:2">${Object.keys(s.li).reduce((h,w)=>h.replace(new RegExp(esc(w),"i"),m=>`<mark class="${s.li[w]>0?"mf":"mr"}">${m}</mark>`),s.t)}</p>${Object.entries(s.li).map(([w,v])=>`<span class="badge ${v>0?"b-f":"b-r"}">${w} ${v>0?"+":""}${v}</span> `).join("")}</div></div></div>`).join("")}
+<div class="card"><h3>How to read this</h3><p class="sub" style="margin:0">SHAP gives each feature a fair share of the prediction (global + local). LIME fits a small interpretable model around one article. Agreement between both builds trust; disagreement reveals fragile predictions.</p></div>${foot}`},
+
+errors:()=>`${head("Error Analysis","Where does the model go right or wrong?")}${DEMOB}
+<div class="grid"><div class="card"><div class="ic">✅</div><div class="big">946</div><b>Correct predictions</b><br><small style="color:var(--mut)">TP 468 · TN 478 (of 1000) · DEMO</small></div>
+<div class="card"><div class="ic">🚩</div><div class="big">28</div><b>False positives</b><br><small style="color:var(--mut)">Real news flagged as FAKE · DEMO</small></div>
+<div class="card"><div class="ic">⚠️</div><div class="big">26</div><b>False negatives</b><br><small style="color:var(--mut)">Fake news passed as REAL · DEMO</small></div></div>
+<div class="grid g2"><div><h2>Error rate by language <span class="badge b-d">DEMO</span></h2><div class="card">${hb([["English",3.8],["Spanish",4.9],["Hindi",5.1],["Tamil (unseen)",12.4]],["var(--bad)"],20)}</div></div>
+<div><h2>Error rate by article length <span class="badge b-d">DEMO</span></h2><div class="card">${hb([["< 50 words",11.2],["50–150",6.1],["150–400",3.9],["> 400",4.6]],["var(--warn)"],20)}</div></div></div>
+<h2>Typical error types <span class="badge b-d">ILLUSTRATIVE</span></h2><div class="card">${tbl(["Type","Example","Likely reason"],[["<span class='badge b-f'>False negative</span>","Calm, well-written hoax with fake 'official' quotes","No sensational style to detect"],["<span class='badge b-r'>False positive</span>","Genuine breaking news with urgent wording","Emotional tone mistaken for clickbait"],["<span class='badge b-f'>False negative</span>","Very short headline in an unseen language","Too little context"]])}</div>${foot}`,
+
+about:()=>`${head("About the Project","Multilingual Fake News Detection using Transformer Models")}
+<div class="grid g2">${[["🎯","Problem statement","Fake news spreads in every language, but most detectors are trained for one language, usually English."],["⚠️","Existing problem","Language-dependent detectors fail on other languages and scripts, and low-resource languages lack labelled data."],["💡","Proposed solution","Fine-tune XLM-RoBERTa, a transformer pre-trained on ~100 languages, so one model transfers knowledge across languages."],["🗂️","Dataset","Labelled news (text, FAKE/REAL, language) from public corpora. <b>Final dataset and counts to be added.</b>"],["🤖","ML models","Logistic Regression, Multinomial Naive Bayes, Random Forest and XGBoost on TF-IDF n-gram features with feature selection."],["🔤","XLM-RoBERTa","Transformer encoder fine-tuned for binary FAKE/REAL classification; compared on seen and unseen languages."],["📏","Evaluation metrics","Accuracy, precision, recall, F1-score, confusion matrix, and zero-shot F1 on a held-out language."],["🚧","Limitations","Dataset label noise, few low-resource languages, text only (no images or sources), satire and short headlines are hard, and a statistical score is not a fact-check."]].map(c=>`<div class="card"><div class="ic">${c[0]}</div><h3>${c[1]}</h3><p class="sub" style="margin:0">${c[2]}</p></div>`).join("")}</div>
+<h2>Prototype status</h2><div class="card"><span class="badge b-d">DEMO</span> The interface is complete. The analyzer uses a rule-based demo engine and all metrics are placeholders until trained models are connected. Set <code>window.TRUTHLENS_API</code> to a prediction endpoint to switch the analyzer to real model output.</div>${foot}`};
+/* ---------- router & behaviour ---------- */
+side.innerHTML=`<div class="logo"><s>🔍</s>TruthLens</div>${PG.map(p=>`<a href="#${p[0]}" data-p="${p[0]}"><span>${p[1]}</span>${p[2]}</a>`).join("")}<div class="sf"><button class="btn" id="th">🌓 Toggle theme</button>Demo prototype<br>v0.1 · college project</div>`;
+const fill=i=>{$("#txt").value=SAMPLES[i][1];$("#lang").value={TA:"Tamil",EN:"English",HI:"Hindi",ES:"Spanish"}[SAMPLES[i][0].slice(0,2)]};
+function route(){const k=P[location.hash.slice(1)]?location.hash.slice(1):"home";app.innerHTML=P[k]();window.scrollTo(0,0);side.classList.remove("open");
+ side.querySelectorAll("a").forEach(a=>a.classList.toggle("on",a.dataset.p==k));
+ requestAnimationFrame(()=>setTimeout(()=>app.querySelectorAll("[data-w]").forEach(e=>e.style.width=e.dataset.w+"%"),60));
+ if(k=="detect"){$("#go").onclick=analyze;app.querySelectorAll("[data-s]").forEach(c=>c.onclick=()=>fill(c.dataset.s));if(window._pre!=null){fill(window._pre);window._pre=null}}
+ const tl=app.querySelector("a[data-s]");if(tl&&k=="multi")tl.onclick=()=>{window._pre=2}}
+async function analyze(){const t=$("#txt").value.trim();if(t.length<15){$("#err").textContent="Please enter a longer news text.";return}$("#err").textContent="";
+ let r=predict(t),live=false;
+ if(window.TRUTHLENS_API){try{const j=await(await fetch(window.TRUTHLENS_API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text:t,language:$("#lang").value})})).json();r.fake=j.label=="FAKE";r.conf=j.confidence;live=true}catch(e){}}
+ const sel=$("#lang").value,det=LN[r.lang],C=r.fake?"var(--bad)":"var(--ok)",cues=r.hits.map(h=>`<span class="badge ${h.f?"b-f":"b-r"}">${h.k}</span>`).join(" ");
+ const why=r.fake?`Flagged as <b>FAKE</b>: found ${r.f} sensational / clickbait cue${r.f==1?"":"s"}${r.ex?`, ${r.ex>2?"repeated":"some"} exclamation marks`:""}${r.caps>.3?", heavy use of capital letters":""} and little source attribution.`:`Classified as <b>REAL</b>: the text uses neutral, source-attributed language${r.r?` (${r.r} credibility cue${r.r==1?"":"s"})`:""} with ${r.f?"only weak":"no"} sensational cues.`;
+ $("#res").innerHTML=`<div class="spin"><h3>Result</h3><div style="display:flex;gap:20px;align-items:center;flex-wrap:wrap"><svg class="ring" viewBox="0 0 120 120"><circle cx="60" cy="60" r="52" stroke="var(--bd)"/><circle class="fg" id="fg" cx="60" cy="60" r="52" stroke="${C}" style="stroke-dasharray:0 327"/><text x="60" y="66" text-anchor="middle" font-size="22" font-weight="800" fill="currentColor">${r.conf}%</text></svg>
+ <div><div class="vd" style="color:${C}">${r.fake?"❌ FAKE":"✅ REAL"}</div><span class="badge ${live?"b-r":"b-d"}">${live?"LIVE MODEL OUTPUT":"DEMO MODE – rule-based stand-in"}</span></div></div>
+ <div class="kv"><div><small>Confidence</small><b>${r.conf}%</b></div><div><small>Detected language</small><b>${det}</b></div><div><small>Model used</small><b>XLM-RoBERTa</b></div><div><small>Selected language</small><b>${sel}</b></div></div>
+ ${sel!="Other"&&sel!=det?`<p class="sub" style="color:var(--warn)">Note: the text looks like ${det}, but ${sel} was selected.</p>`:""}
+ <h3>Why this result?</h3><p>${why}</p><p style="line-height:2">${hl(t)}</p><p>${cues||'<span class="sub">No strong cue words found – low-information text.</span>'}</p>
+ <p class="sub" style="font-size:12px">${live?"Prediction returned by the connected model API.":"DEMO prediction: produced by simple keyword rules in your browser, not by the trained XLM-RoBERTa model."}</p></div>`;
+ setTimeout(()=>{const f=$("#fg");if(f)f.style.strokeDasharray=`${3.27*r.conf} 327`},50)}
+$("#th").onclick=()=>{const d=document.documentElement,dark=d.dataset.theme?d.dataset.theme=="dark":matchMedia("(prefers-color-scheme:dark)").matches;d.dataset.theme=dark?"light":"dark"};
+addEventListener("hashchange",route);route();
+</script>
+</body>
+</html>
